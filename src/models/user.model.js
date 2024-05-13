@@ -14,9 +14,9 @@ const userSchema = new mongoose.Schema({
     type: Number,
     default: 0,
   },
-  updateQuery : {
-    type : {},
-    required : false
+  updateQuery: {
+    type: {},
+    required: false
   }
 });
 

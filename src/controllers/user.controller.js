@@ -1,32 +1,22 @@
-const {User,Parent} = require("../models/user.model");
-
-exports.createParent = async (req, res) => {
-  try {
-    const { name } = req.body;
-
-    const newParent = new Parent({ name });
-    await newParent.save();
-    return res.status(201).json(newParent);
-  } catch (error) {
-    console.error(error);
-    return res.status(500).json({ error: 'Internal server error' });
-  }
-};
-
+const { User, Parent } = require("../models/user.model");
 
 exports.createUser = async (req, res) => {
   try {
-    const { name, parentId } = req.body;
+    const { name, parentId, parentName } = req.body;
 
-    if (parentId) {
-     
-      const parentUser = await Parent.findById(parentId);
+    let newUser;
+    if(parentId) {
+        const parentUser = await Parent.findById(parentId);
       if (!parentUser) {
         return res.status(400).json({ error: 'Parent user not found' });
       }
+      newUser = new User({ name, parentId });
+    } else if (parentName) {
+      const newParent = new Parent({ name: parentName });
+      await newParent.save();
+      newUser = new User({ name, parentId: newParent._id });
+    } else { newUser = new User({ name });
     }
-
-    const newUser = new User({ name, parentId });
     await newUser.save();
     return res.status(201).json(newUser);
   } catch (error) {
@@ -34,7 +24,6 @@ exports.createUser = async (req, res) => {
     return res.status(500).json({ error: 'Internal server error' });
   }
 };
-
 
 exports.distributeEarnings = async (req, res) => {
   try {
@@ -64,13 +53,13 @@ exports.distributeEarnings = async (req, res) => {
     }
     await User.findByIdAndUpdate(
       userId,
-      {$set: {distributedAmount: distributedAmount}},
+      { $set: { distributedAmount: distributedAmount } },
       { $inc: { earnings: amount - distributedAmount } }
     );
 
     const updatedUser = await User.findById(userId);
-    
-    console.log("Updated User:", updatedUser); 
+
+    console.log("Updated User:", updatedUser);
 
     return res.status(200).json({ message: 'Earnings distributed successfully', user: updatedUser });
   } catch (error) {
@@ -78,8 +67,3 @@ exports.distributeEarnings = async (req, res) => {
     return res.status(500).json({ error: 'Internal server error' });
   }
 };
-
-
-
-
-
