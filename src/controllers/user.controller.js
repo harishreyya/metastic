@@ -31,7 +31,7 @@ exports.distributeEarnings = async (req, res) => {
     const user = await User.findById(userId);
     if (!user) {
       return res.status(400).json({ error: 'User not found' });
-    }
+    }                
     if (isNaN(amount) || amount <= 0) {
       return res.status(400).json({ error: 'Invalid amount' });
     }
