@@ -3,8 +3,9 @@ const { User, Parent } = require("../models/user.model");
 exports.createUser = async (req, res) => {
   try {
     const { name, parentId, parentName } = req.body;
-
+    
     let newUser;
+
     if(parentId) {
         const parentUser = await Parent.findById(parentId);
       if (!parentUser) {
@@ -51,6 +52,7 @@ exports.distributeEarnings = async (req, res) => {
     for (const [key, value] of Object.entries(distribution)) {
       distributedAmount += value;
     }
+
     await User.findByIdAndUpdate(
       userId,
       { $set: { distributedAmount: distributedAmount } },
@@ -66,4 +68,4 @@ exports.distributeEarnings = async (req, res) => {
     console.error(error);
     return res.status(500).json({ error: 'Internal server error' });
   }
-};
+}
